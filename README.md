@@ -45,7 +45,18 @@
 - Easy to find items, switched, variables, etc by searching text.
 - Save location and recall, teleport cheats.
 - Supports developers tool.
-- Translate variables, switches, maps. (Needs [ezTransWeb](https://github.com/HelloKS/ezTransWeb) : Only supports for Korean.)
+- Translate variables, switches, maps with multiple providers:
+    - ezTransWeb (JP → KR)
+    - eztrans-server (JP → KR)
+    - Ollama (Any → Any language)
+    - Google Translate (Any → Any language)
+    - DeepL (Any → Any language)
+    - Custom translation endpoint support
+    - Configurable source and target languages
+- **NEW: Bookmark system** - Bookmark frequently used variables, items, weapons, and armors for quick access
+- **NEW: Item lock system** - Lock item values to prevent them from changing even when consumed in-game
+- **NEW: Smart scroll position** - Automatically returns to the last modified item/variable when reopening the cheat panel
+- **NEW: Category-specific "Give All" button** - Give all items in the current category (items/weapons/armors) with one click
 - **Maybe more features..?**
 
 
