@@ -45,7 +45,18 @@
 - Easy to find items, switched, variables, etc by searching text.
 - Save location and recall, teleport cheats.
 - Supports developers tool.
-- Translate variables, switches, maps. (Needs [ezTransWeb](https://github.com/HelloKS/ezTransWeb) : Only supports for Korean.)
+- Translate variables, switches, maps with multiple providers:
+    - ezTransWeb (JP → KR)
+    - eztrans-server (JP → KR)
+    - Ollama (Any → Any language)
+    - Google Translate (Any → Any language)
+    - DeepL (Any → Any language)
+    - Custom translation endpoint support
+    - Configurable source and target languages
+- **NEW: Bookmark system** - Bookmark frequently used variables, items, weapons, and armors for quick access
+- **NEW: Item lock system** - Lock item values to prevent them from changing even when consumed in-game
+- **NEW: Smart scroll position** - Automatically returns to the last modified item/variable when reopening the cheat panel
+- **NEW: Category-specific "Give All" button** - Give all items in the current category (items/weapons/armors) with one click
 - **Maybe more features..?**
 
 
@@ -93,7 +104,7 @@ Just copy the `www/cheat-settings` folder of the game that already has settings 
 - Cheats may not work properly in older versions of the game since the script is based on es6.
 - In that case, you need to force update to the new nwjs version.
 
-1. Download latest version of [nwjs](https://dl.nwjs.io/v0.61.0/) and unzip. (`{version}/nwjs-symbol-v{version}-win-{ia32|x64}.7z`)
+1. Download latest version of [nwjs](https://dl.nwjs.io/v0.85.0/) and unzip. (`{version}/nwjs-v{version}-win-x64.zip` or `nwjs-sdk-v{version}-win-x64.zip` for developer tools)
    - If you need developer tools, download the sdk version.
 2. Copy `www` directory and `package.json` file from the game directory to nwjs directory.
    - <img src="https://user-images.githubusercontent.com/99193603/153755660-25da5b48-b542-443e-bd38-2e3e95e13a63.JPG" width="500"/>

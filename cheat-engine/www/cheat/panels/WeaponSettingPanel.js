@@ -13,7 +13,8 @@ export default {
         :items="items"
         :headers="headers"
         :as-table-data="convertToTableData"
-        :searchable-attrs="['name', 'desc']">
+        :searchable-attrs="['name', 'desc']"
+        item-type="weapons">
         
     </item-table-tab>
 </v-card>

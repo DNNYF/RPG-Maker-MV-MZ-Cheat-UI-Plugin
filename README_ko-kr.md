@@ -96,7 +96,7 @@
 - 치트 스크립트가 es6 문법으로 작성되었기 때문에 낮은 버전의 MV 게임들은 치트가 적용이 안 될 수 있습니다.
 - 이런 경우, 직접 게임의 nwjs 버전을 올리면 치트 사용 가능합니다.
 
-1. [nwjs](https://dl.nwjs.io/v0.61.0/) 최신 버전을 다운로드 하고 압축 풀기. (파일: `{버전}/nwjs-symbol-v{버전}-win-{ia32|x64}.7z`)
+1. [nwjs](https://dl.nwjs.io/v0.85.0/) 최신 버전을 다운로드 하고 압축 풀기. (파일: `{버전}/nwjs-v{버전}-win-x64.zip` 또는 SDK 버전 `nwjs-sdk-v{버전}-win-x64.zip`)
    - 개발자 툴을 사용해야하는 경우 sdk 버전으로 다운로드.
 2. 원본 게임 폴더의 `www` 폴더와 `package.json` 파일을 압축을 푼 nwjs 폴더로 이동.
    - <img src="https://user-images.githubusercontent.com/99193603/153755660-25da5b48-b542-443e-bd38-2e3e95e13a63.JPG" width="500"/>

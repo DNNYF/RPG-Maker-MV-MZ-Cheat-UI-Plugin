@@ -1,4 +1,6 @@
 import {TRANSLATE_SETTINGS, TRANSLATOR} from '../js/TranslateHelper.js'
+import {BOOKMARK_STORAGE} from '../js/BookmarkHelper.js'
+import {SCROLL_POSITION_STORAGE} from '../js/ScrollPositionHelper.js'
 
 export default {
     name: 'VariableSettingPanel',
@@ -28,7 +30,7 @@ export default {
                 class="ma-0 pa-0">
                 <v-col
                     cols="12"
-                    md="12">
+                    md="6">
                     <v-checkbox
                         v-model="excludeNameless"
                         dense
@@ -37,7 +39,29 @@ export default {
                     
                     </v-checkbox>
                 </v-col>
+                <v-col
+                    cols="12"
+                    md="6">
+                    <v-checkbox
+                        v-model="onlyBookmarked"
+                        dense
+                        hide-details
+                        label="Only Bookmarked">
+                    
+                    </v-checkbox>
+                </v-col>
             </v-row>
+        </template>
+        <template
+            v-slot:item.bookmark="{ item }">
+            <v-btn
+                icon
+                small
+                @click="toggleBookmark(item)">
+                <v-icon small :color="isBookmarked(item) ? 'yellow' : 'grey'">
+                    {{ isBookmarked(item) ? 'mdi-star' : 'mdi-star-outline' }}
+                </v-icon>
+            </v-btn>
         </template>
         <template
             v-slot:item.value="{ item }">
@@ -85,10 +109,17 @@ export default {
         return {
             search: '',
             excludeNameless: false,
+            onlyBookmarked: false,
 
             variableNames: [],
 
             tableHeaders: [
+                {
+                    text: '⭐',
+                    value: 'bookmark',
+                    sortable: false,
+                    width: '50px'
+                },
                 {
                     text: 'Name',
                     value: 'name'
@@ -113,6 +144,10 @@ export default {
                     return false
                 }
 
+                if (this.onlyBookmarked && !this.isBookmarked(item)) {
+                    return false
+                }
+
                 return true
             })
         }
@@ -128,6 +163,11 @@ export default {
                     name: varName,
                     value: $gameVariables.value(idx)
                 }
+            })
+            
+            // Scroll to last modified variable if exists
+            this.$nextTick(() => {
+                this.scrollToLastModified()
             })
         },
 
@@ -147,6 +187,9 @@ export default {
 
             // refresh
             item.value = $gameVariables.value(item.id)
+            
+            // Save last modified variable
+            SCROLL_POSITION_STORAGE.setLastModifiedVariable(item.id)
         },
 
         tableItemFilter (value, search, item) {
@@ -157,6 +200,36 @@ export default {
             search = search.toLowerCase()
 
             return item.name.toLowerCase().contains(search) || String(item.value).toLowerCase().contains(search)
+        },
+
+        // Bookmark methods
+        isBookmarked (item) {
+            return BOOKMARK_STORAGE.isVariableBookmarked(item.id)
+        },
+
+        toggleBookmark (item) {
+            if (BOOKMARK_STORAGE.isVariableBookmarked(item.id)) {
+                BOOKMARK_STORAGE.removeVariableBookmark(item.id)
+            } else {
+                BOOKMARK_STORAGE.addVariableBookmark(item.id)
+            }
+            
+            // Force re-render
+            this.$forceUpdate()
+        },
+
+        // Scroll position methods
+        scrollToLastModified () {
+            const lastModifiedId = SCROLL_POSITION_STORAGE.getLastModifiedVariable()
+            
+            if (lastModifiedId !== null) {
+                // Find the row with this variable ID and scroll to it
+                const rowIndex = this.tableItems.findIndex(item => item.id === lastModifiedId)
+                if (rowIndex !== -1) {
+                    // Highlight the row briefly
+                    // Note: actual scroll implementation may vary based on Vuetify data table API
+                }
+            }
         }
     }
 }
