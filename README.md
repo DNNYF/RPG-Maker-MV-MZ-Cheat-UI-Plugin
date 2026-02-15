@@ -104,7 +104,7 @@ Just copy the `www/cheat-settings` folder of the game that already has settings 
 - Cheats may not work properly in older versions of the game since the script is based on es6.
 - In that case, you need to force update to the new nwjs version.
 
-1. Download latest version of [nwjs](https://dl.nwjs.io/v0.61.0/) and unzip. (`{version}/nwjs-symbol-v{version}-win-{ia32|x64}.7z`)
+1. Download latest version of [nwjs](https://dl.nwjs.io/v0.85.0/) and unzip. (`{version}/nwjs-v{version}-win-x64.zip` or `nwjs-sdk-v{version}-win-x64.zip` for developer tools)
    - If you need developer tools, download the sdk version.
 2. Copy `www` directory and `package.json` file from the game directory to nwjs directory.
    - <img src="https://user-images.githubusercontent.com/99193603/153755660-25da5b48-b542-443e-bd38-2e3e95e13a63.JPG" width="500"/>
