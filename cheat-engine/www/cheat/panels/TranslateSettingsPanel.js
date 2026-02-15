@@ -187,6 +187,38 @@ export default {
             @change="onChangeTargetsValue">
         </v-switch>
     </v-card-text>
+    
+    <v-card-subtitle class="pb-0 mt-4 font-weight-bold">Language Settings</v-card-subtitle>
+    <v-card-text class="py-0">
+        <v-select
+            v-model="sourceLanguage"
+            dense
+            hide-details
+            :items="languageOptions"
+            item-value="code"
+            item-text="name"
+            background-color="grey darken-3"
+            label="Source Language"
+            solo
+            class="mb-2"
+            :disabled="!enabled"
+            @change="onChangeSourceLanguage">
+        </v-select>
+        
+        <v-select
+            v-model="targetLanguage"
+            dense
+            hide-details
+            :items="languageOptions.filter(lang => lang.code !== 'auto')"
+            item-value="code"
+            item-text="name"
+            background-color="grey darken-3"
+            label="Target Language"
+            solo
+            :disabled="!enabled"
+            @change="onChangeTargetLanguage">
+        </v-select>
+    </v-card-text>
 </v-card>
     `,
 
@@ -213,7 +245,33 @@ export default {
 
             customEndPointData: {},
 
-            bulkTranslateChunkSize: 500
+            bulkTranslateChunkSize: 500,
+            
+            sourceLanguage: 'auto',
+            targetLanguage: 'en',
+            
+            languageOptions: [
+                { code: 'auto', name: 'Auto Detect' },
+                { code: 'en', name: 'English' },
+                { code: 'es', name: 'Spanish' },
+                { code: 'fr', name: 'French' },
+                { code: 'de', name: 'German' },
+                { code: 'it', name: 'Italian' },
+                { code: 'pt', name: 'Portuguese' },
+                { code: 'ru', name: 'Russian' },
+                { code: 'ja', name: 'Japanese' },
+                { code: 'ko', name: 'Korean' },
+                { code: 'zh', name: 'Chinese (Simplified)' },
+                { code: 'zh-TW', name: 'Chinese (Traditional)' },
+                { code: 'ar', name: 'Arabic' },
+                { code: 'hi', name: 'Hindi' },
+                { code: 'nl', name: 'Dutch' },
+                { code: 'pl', name: 'Polish' },
+                { code: 'tr', name: 'Turkish' },
+                { code: 'vi', name: 'Vietnamese' },
+                { code: 'th', name: 'Thai' },
+                { code: 'id', name: 'Indonesian' }
+            ]
         }
     },
 
@@ -280,6 +338,9 @@ export default {
 
             this.targets = TRANSLATE_SETTINGS.getTargets()
             this.bulkTranslateChunkSize = TRANSLATE_SETTINGS.getBulkTranslateChunkSize()
+            
+            this.sourceLanguage = TRANSLATE_SETTINGS.getSourceLanguage()
+            this.targetLanguage = TRANSLATE_SETTINGS.getTargetLanguage()
 
             this.checkTranslatorAvailable()
         },
@@ -335,6 +396,14 @@ export default {
             }
 
             TRANSLATE_SETTINGS.setBulkTranslateChunkSize(Number(this.bulkTranslateChunkSize))
+        },
+
+        onChangeSourceLanguage () {
+            TRANSLATE_SETTINGS.setSourceLanguage(this.sourceLanguage)
+        },
+
+        onChangeTargetLanguage () {
+            TRANSLATE_SETTINGS.setTargetLanguage(this.targetLanguage)
         }
     }
 }

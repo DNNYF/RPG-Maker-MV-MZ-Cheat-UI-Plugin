@@ -22,12 +22,52 @@ export const DEFAULT_END_POINTS = {
             urlPattern: `http://localhost:8000`,
             body: END_POINT_URL_PATTERN_TEXT_SYMBOL
         }
+    },
+
+    ollama: {
+        id: 'ollama',
+        name: 'Ollama (Any → Any)',
+        helpUrl: 'https://ollama.ai',
+        data: {
+            method: 'post',
+            urlPattern: `http://localhost:11434/api/generate`,
+            body: JSON.stringify({
+                model: 'llama2',
+                prompt: `Translate the following text to English: ${END_POINT_URL_PATTERN_TEXT_SYMBOL}`,
+                stream: false
+            }),
+            isOllama: true
+        }
+    },
+
+    googleTranslate: {
+        id: 'googleTranslate',
+        name: 'Google Translate (Any → Any)',
+        helpUrl: 'https://cloud.google.com/translate',
+        data: {
+            method: 'get',
+            urlPattern: `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${END_POINT_URL_PATTERN_TEXT_SYMBOL}`
+        }
+    },
+
+    deepL: {
+        id: 'deepL',
+        name: 'DeepL (Any → Any)',
+        helpUrl: 'https://www.deepl.com/translator',
+        data: {
+            method: 'post',
+            urlPattern: `https://api-free.deepl.com/v2/translate`,
+            body: `auth_key=YOUR_API_KEY&text=${END_POINT_URL_PATTERN_TEXT_SYMBOL}&target_lang=EN`
+        }
     }
 }
 
 export const RECOMMEND_CHUNK_SIZE = {
     ezTransWeb: 500,
-    ezTransServer: 100
+    ezTransServer: 100,
+    ollama: 50,
+    googleTranslate: 200,
+    deepL: 100
 }
 
 
@@ -52,10 +92,38 @@ class Translator {
         const realUrl = epData.urlPattern.replace(END_POINT_URL_PATTERN_TEXT_SYMBOL, encodeURI(text))
 
         if (epData.method === 'get') {
-            return (await axios.get(realUrl)).data
+            const response = (await axios.get(realUrl)).data
+            
+            // Handle Google Translate response format
+            if (Array.isArray(response) && response[0] && Array.isArray(response[0])) {
+                return response[0].map(item => item[0]).join('')
+            }
+            
+            return response
         } else if (epData.method === 'post') {
             const body = epData.body ? epData.body : ''
-            return (await axios.post(realUrl, body.replace(END_POINT_URL_PATTERN_TEXT_SYMBOL, text))).data
+            const requestBody = body.replace(END_POINT_URL_PATTERN_TEXT_SYMBOL, text)
+            
+            let response
+            if (epData.isOllama) {
+                // Parse JSON body for Ollama
+                const bodyObj = JSON.parse(requestBody)
+                response = (await axios.post(realUrl, bodyObj)).data
+                
+                // Handle Ollama response format
+                if (response.response) {
+                    return response.response
+                }
+            } else {
+                response = (await axios.post(realUrl, requestBody)).data
+                
+                // Handle DeepL response format
+                if (response.translations && Array.isArray(response.translations)) {
+                    return response.translations[0].text
+                }
+            }
+            
+            return response
         }
 
         return text
@@ -130,12 +198,23 @@ class TranslateSettings {
                     maps: true,
                 },
 
-                bulkTranslateChunkSize: 500
+                bulkTranslateChunkSize: 500,
+                
+                sourceLanguage: 'auto',
+                targetLanguage: 'en'
             }
             return
         }
 
         this.data = JSON.parse(json)
+        
+        // Ensure new fields exist for backward compatibility
+        if (!this.data.sourceLanguage) {
+            this.data.sourceLanguage = 'auto'
+        }
+        if (!this.data.targetLanguage) {
+            this.data.targetLanguage = 'en'
+        }
     }
 
     __writeSettings () {
@@ -220,6 +299,24 @@ class TranslateSettings {
 
     isMapTranslateEnabled () {
         return this.isEnabled() && this.getTargets().maps
+    }
+
+    getSourceLanguage () {
+        return this.data.sourceLanguage
+    }
+
+    setSourceLanguage (lang) {
+        this.data.sourceLanguage = lang
+        this.__writeSettings()
+    }
+
+    getTargetLanguage () {
+        return this.data.targetLanguage
+    }
+
+    setTargetLanguage (lang) {
+        this.data.targetLanguage = lang
+        this.__writeSettings()
     }
 }
 
