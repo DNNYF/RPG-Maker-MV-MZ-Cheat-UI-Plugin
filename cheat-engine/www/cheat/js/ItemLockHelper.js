@@ -30,17 +30,30 @@ class ItemLockStorage {
         // Hook into game update loop to restore locked values
         const self = this
         
+        // Prevent multiple hooks
+        if (this._hookInstalled) {
+            return
+        }
+        
         if (typeof SceneManager !== 'undefined' && SceneManager.updateMain) {
             const originalUpdate = SceneManager.updateMain
             SceneManager.updateMain = function() {
                 originalUpdate.call(this)
                 self.__restoreLockedValues()
             }
+            this._hookInstalled = true
         }
     }
 
     __restoreLockedValues () {
         if (!$gameParty) return
+        
+        // Skip if no items are locked (performance optimization)
+        if (Object.keys(this.data.lockedItems).length === 0 &&
+            Object.keys(this.data.lockedWeapons).length === 0 &&
+            Object.keys(this.data.lockedArmors).length === 0) {
+            return
+        }
 
         // Restore locked items
         for (const itemId in this.data.lockedItems) {

@@ -88,8 +88,18 @@ class Translator {
 
     async __translate (text) {
         const epData = this.settings.getEndPointData()
+        const sourceLang = this.settings.getSourceLanguage()
+        const targetLang = this.settings.getTargetLanguage()
 
-        const realUrl = epData.urlPattern.replace(END_POINT_URL_PATTERN_TEXT_SYMBOL, encodeURI(text))
+        let realUrl = epData.urlPattern.replace(END_POINT_URL_PATTERN_TEXT_SYMBOL, encodeURI(text))
+        
+        // Inject language parameters for supported providers
+        const endPointId = this.settings.getEndPointSelection()
+        if (endPointId === 'googleTranslate') {
+            realUrl = realUrl.replace('sl=auto', `sl=${sourceLang}`).replace('tl=en', `tl=${targetLang}`)
+        } else if (endPointId === 'ollama') {
+            // For Ollama, we'll modify the prompt in the body
+        }
 
         if (epData.method === 'get') {
             const response = (await axios.get(realUrl)).data
@@ -102,12 +112,13 @@ class Translator {
             return response
         } else if (epData.method === 'post') {
             const body = epData.body ? epData.body : ''
-            const requestBody = body.replace(END_POINT_URL_PATTERN_TEXT_SYMBOL, text)
+            let requestBody = body.replace(END_POINT_URL_PATTERN_TEXT_SYMBOL, text)
             
             let response
             if (epData.isOllama) {
-                // Parse JSON body for Ollama
+                // Parse JSON body for Ollama and inject language parameters
                 const bodyObj = JSON.parse(requestBody)
+                bodyObj.prompt = `Translate the following text from ${sourceLang === 'auto' ? 'detected language' : sourceLang} to ${targetLang}: ${text}`
                 response = (await axios.post(realUrl, bodyObj)).data
                 
                 // Handle Ollama response format
@@ -115,6 +126,14 @@ class Translator {
                     return response.response
                 }
             } else {
+                // Handle DeepL and other providers
+                if (endPointId === 'deepL') {
+                    requestBody = requestBody.replace('target_lang=EN', `target_lang=${targetLang.toUpperCase()}`)
+                    if (sourceLang !== 'auto') {
+                        requestBody += `&source_lang=${sourceLang.toUpperCase()}`
+                    }
+                }
+                
                 response = (await axios.post(realUrl, requestBody)).data
                 
                 // Handle DeepL response format
